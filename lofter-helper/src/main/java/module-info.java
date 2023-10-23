@@ -5,6 +5,6 @@ module site.achun.lofter.lofterhelper {
         requires org.controlsfx.controls;
                         requires org.kordamp.bootstrapfx.core;
             
-    opens site.achun.lofter.lofterhelper to javafx.fxml;
-    exports site.achun.lofter.lofterhelper;
+    opens site.achun.lofter to javafx.fxml;
+    exports site.achun.lofter;
 }
