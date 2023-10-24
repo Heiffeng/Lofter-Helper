@@ -13,10 +13,7 @@ public class Post {
         this.document = document;
     }
 
-//    body > div > div.g-mn > div > div > div.m-detail.m-detail-img > div > div.ct > div > div.pic > a
-
     public List<Picture> getPictures(){
-        System.out.println(document.body());
         Elements pictureElements = document.body().select("div.pic > a");
         List<Picture> pictures = pictureElements.stream().map(ele -> {
             String src = ele.attr("bigimgsrc");

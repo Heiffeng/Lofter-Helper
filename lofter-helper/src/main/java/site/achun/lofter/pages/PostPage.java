@@ -34,7 +34,6 @@ public class PostPage {
     }
 
     public String nextPage(){
-//        div.m-pager > a.next
         Element element = document.body().select("div.m-pager > a.next").first();
         if(element!=null){
             return getHost() + element.attr("href");

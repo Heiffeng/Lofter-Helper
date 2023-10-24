@@ -1,11 +1,14 @@
 package site.achun.lofter.views;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import org.jsoup.nodes.Document;
 import site.achun.lofter.bean.Picture;
 import site.achun.lofter.pages.Post;
@@ -13,6 +16,7 @@ import site.achun.lofter.pages.PostPage;
 import site.achun.lofter.utils.HttpClientUtil;
 import site.achun.lofter.utils.UrlHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -20,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -28,33 +31,61 @@ public class HomeView extends VBox {
 
     private TextField textField;
     private Label tipLabel;
+    Label pathLabel;
+    private File saveDir;
 
     public HomeView(){
         setSpacing(10);
-        textField = new TextField("输入要爬取的地址");
-        Button button = new Button("确定");
 
-        button.setOnAction(this::onAction);
-
+        // 输入框
         HBox hBox = new HBox(10);
-        hBox.getChildren().addAll(textField,button);
-
+        textField = new TextField("输入要爬取的地址");
+        hBox.getChildren().addAll(new Label("爬取地址："),textField);
         this.getChildren().add(hBox);
 
+        // 保存路径选择
+        HBox pathHBox = new HBox(10);
+        pathLabel = new Label();
+        Button chooseButton = new Button("选择...");
+        chooseButton.setOnAction(this::chooseSavePath);
+        pathHBox.getChildren().addAll(new Label("保存路径："),pathLabel,chooseButton);
+        this.getChildren().add(pathHBox);
+
+        // 确定按钮
+        Button button = new Button("确定");
+        button.setOnAction(this::onAction);
+        this.getChildren().add(button);
+
+        // 提示
         tipLabel = new Label();
         this.getChildren().add(tipLabel);
     }
 
+    private void chooseSavePath(ActionEvent event) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File chooseDir = directoryChooser.showDialog(new Stage());
+        if(chooseDir!=null && chooseDir.listFiles()!=null&&chooseDir.listFiles().length > 0){
+            tipLabel.setText("选择的目录不为空，请重新选择");
+            return;
+        }
+        saveDir = chooseDir;
+        pathLabel.setText(saveDir.getPath());
+        Path.of(saveDir.getPath(),"img").toFile().mkdirs();
+    }
+
+
     private void onAction(ActionEvent event) {
         String url = textField.getText();
         //
-        try {
-           dealPage(url);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        CompletableFuture.runAsync(()->{
+            try {
+                dealPage(url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void dealPage(String pageUrl) throws IOException, InterruptedException {
@@ -65,13 +96,17 @@ public class HomeView extends VBox {
         if(nextPageUrl!=null){
             dealPage(nextPageUrl);
         }else{
-            tipLabel.setText("爬取完毕");
+            Platform.runLater(()->{
+                tipLabel.setText("爬取完毕");
+            });
         }
     }
 
     private void dealPage(PostPage page){
         String tips = String.format("正在爬取第%d页内容", page.getPageIndex());
-        tipLabel.setText(tips);
+        Platform.runLater(()->{
+            tipLabel.setText(tips);
+        });
         System.out.println(tips);
         try {
             Thread.sleep(2000);
@@ -101,8 +136,7 @@ public class HomeView extends VBox {
         }
     }
 
-    public static void download(String pictureUrl) {
-        String targetDirectory = "D:\\downloads"; // 替换为目标下载目录
+    public void download(String pictureUrl) {
         try {
             // 创建URL对象
             URL url = new URL(pictureUrl);
@@ -114,7 +148,7 @@ public class HomeView extends VBox {
             String fileName = UrlHandler.create(pictureUrl).getPath();
 
             // 创建目标文件的路径
-            Path targetPath = Path.of(targetDirectory, fileName);
+            Path targetPath = Path.of(saveDir.getPath(), fileName);
 
             // 下载文件并保存到本地
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
