@@ -11,8 +11,8 @@ public class PostTest {
 //    https://sakalee.lofter.com/post/acbce_45a41f
         String url = "https://sboneqiu.lofter.com/post/1d631d67_125fc4a5";
         Document document = HttpClientUtil.getDocument(url);
-        document.setBaseUri(url);
         Post post = new Post(document);
-        post.getPictures().stream().forEach(System.out::println);
+//        post.getPictures().stream().forEach(System.out::println);
+        post.getTags().stream().forEach(System.out::println);
     }
 }
