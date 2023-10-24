@@ -1,17 +1,13 @@
 package site.achun.lofter;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import site.achun.lofter.views.HomeView;
 
-import java.io.IOException;
-
 public class LofterApplication extends Application {
     @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(LofterApplication.class.getResource("hello-view.fxml"));
+    public void start(Stage stage){
         Scene scene = new Scene(new HomeView(), 320, 240);
         stage.setTitle("Hello!");
         stage.setScene(scene);
