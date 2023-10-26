@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PostInfo {
 
-    private LocalDateTime postTime;
+    private String postTime;
     private String content;
     private List<String> tags;
     private List<Picture> pictures;
@@ -36,11 +36,11 @@ public class PostInfo {
         this.pictures = pictures;
     }
 
-    public LocalDateTime getPostTime() {
+    public String getPostTime() {
         return postTime;
     }
 
-    public void setPostTime(LocalDateTime postTime) {
+    public void setPostTime(String postTime) {
         this.postTime = postTime;
     }
 

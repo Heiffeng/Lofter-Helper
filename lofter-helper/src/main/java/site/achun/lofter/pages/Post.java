@@ -7,7 +7,6 @@ import site.achun.lofter.bean.Picture;
 import site.achun.lofter.utils.UrlHandler;
 
 import java.net.MalformedURLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +30,6 @@ public class Post {
     }
 
     public List<String> getTags(){
-//        body > div > div.g-bd > div > div.m-postdtl > div > div > div.info.box > div.tags.box > a
         Elements eles = document.body().select("div.box > a.tag");
         if(eles == null || eles.size() == 0) return new ArrayList<>();
         return eles.stream().map(ele->ele.html()).collect(Collectors.toList());
@@ -49,7 +47,15 @@ public class Post {
         }
     }
 
-    public LocalDateTime getPostTime() {
+    public String getPostTime() {
+        Elements eles = document.body().select("a.date");
+        if(eles != null && eles.size() > 0 ){
+            return eles.first().html();
+        }
+        return null;
+    }
+
+    public String getThemeName(){
         return null;
     }
 
