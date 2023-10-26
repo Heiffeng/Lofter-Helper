@@ -2,8 +2,12 @@ package site.achun.lofter.pages;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import site.achun.lofter.bean.Comment;
 import site.achun.lofter.bean.Picture;
+import site.achun.lofter.utils.UrlHandler;
 
+import java.net.MalformedURLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,4 +41,22 @@ public class Post {
         return document.body().select("div.text").html();
     }
 
+    public String getPostCode(){
+        try {
+            return UrlHandler.create(document.baseUri()).getPath().replace("/post/","");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public LocalDateTime getPostTime() {
+        return null;
+    }
+
+    public Integer getHot(){
+        return -1;
+    }
+    public List<Comment> getComments(){
+        return null;
+    }
 }

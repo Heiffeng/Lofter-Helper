@@ -7,7 +7,10 @@ module site.achun.lofter.lofterhelper {
 
     requires java.net.http;
     requires org.jsoup;
-
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
     opens site.achun.lofter to javafx.fxml;
+    exports site.achun.lofter.bean to com.fasterxml.jackson.databind;
+
     exports site.achun.lofter;
 }

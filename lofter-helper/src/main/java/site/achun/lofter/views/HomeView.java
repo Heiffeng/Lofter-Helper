@@ -9,23 +9,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.jsoup.nodes.Document;
-import site.achun.lofter.bean.Picture;
-import site.achun.lofter.pages.Post;
-import site.achun.lofter.pages.PostPage;
-import site.achun.lofter.utils.HttpClientUtil;
-import site.achun.lofter.utils.UrlHandler;
+import org.jsoup.internal.StringUtil;
+import site.achun.lofter.service.LofterUserService;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class HomeView extends VBox {
 
@@ -39,7 +27,7 @@ public class HomeView extends VBox {
 
         // 输入框
         HBox hBox = new HBox(10);
-        textField = new TextField("输入要爬取的地址");
+        textField = new TextField("");
         hBox.getChildren().addAll(new Label("爬取地址："),textField);
         this.getChildren().add(hBox);
 
@@ -64,98 +52,32 @@ public class HomeView extends VBox {
     private void chooseSavePath(ActionEvent event) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File chooseDir = directoryChooser.showDialog(new Stage());
-        if(chooseDir!=null && chooseDir.listFiles()!=null&&chooseDir.listFiles().length > 0){
-            tipLabel.setText("选择的目录不为空，请重新选择");
+        if(chooseDir==null){
             return;
         }
         saveDir = chooseDir;
         pathLabel.setText(saveDir.getPath());
-        Path.of(saveDir.getPath(),"img").toFile().mkdirs();
     }
-
 
     private void onAction(ActionEvent event) {
         String url = textField.getText();
-        //
-        CompletableFuture.runAsync(()->{
-            try {
-                dealPage(url);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
+        if(StringUtil.isBlank(url)){
+            tipLabel.setText("请输入地址后重试");
+            return;
+        }
+        if(saveDir == null){
+            tipLabel.setText("请选择要保存的文件目录");
+            return;
+        }
 
-    private void dealPage(String pageUrl) throws IOException, InterruptedException {
-        Document document = HttpClientUtil.getDocument(pageUrl);
-        PostPage page = new PostPage(document);
-        dealPage(page);
-        String nextPageUrl = page.nextPage();
-        if(nextPageUrl!=null){
-            dealPage(nextPageUrl);
-        }else{
+        LofterUserService lofterUserService = new LofterUserService(url,saveDir);
+        lofterUserService.setLog(message->{
             Platform.runLater(()->{
-                tipLabel.setText("爬取完毕");
+                tipLabel.setText(message);
             });
-        }
-    }
-
-    private void dealPage(PostPage page){
-        String tips = String.format("正在爬取第%d页内容", page.getPageIndex());
-        Platform.runLater(()->{
-            tipLabel.setText(tips);
         });
-        System.out.println(tips);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {}
-
-        List<Post> postList = page.getPostLinks().stream()
-                .filter(link->link!=null)
-                .map(link -> {
-                    try {
-                        Document document = HttpClientUtil.getDocument(link);
-                        return new Post(document);
-                    } catch (IOException e) {
-                    } catch (InterruptedException e) {
-                    }
-                    return null;
-                })
-                .filter(p->p!=null)
-                .collect(Collectors.toList());
-
-        for (Post post : postList) {
-            List<Picture> pics = post.getPictures();
-            if(pics!=null) {
-                for (Picture pic : pics) {
-                    download(pic.url());
-                }
-            }
-        }
+        CompletableFuture.runAsync(()->{
+                lofterUserService.startDownloadPosts();
+        });
     }
-
-    public void download(String pictureUrl) {
-        try {
-            // 创建URL对象
-            URL url = new URL(pictureUrl);
-
-            // 打开URL连接
-            InputStream inputStream = url.openStream();
-
-            // 获取文件名，假设它位于URL的末尾
-            String fileName = UrlHandler.create(pictureUrl).getPath();
-
-            // 创建目标文件的路径
-            Path targetPath = Path.of(saveDir.getPath(), fileName);
-
-            // 下载文件并保存到本地
-            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("文件下载完成：" + targetPath.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Page {
@@ -27,8 +28,6 @@ public class Page {
 
         Document jsoup = Jsoup.parse(body);
         System.out.println(jsoup.title());
-
-
     }
 
 }
