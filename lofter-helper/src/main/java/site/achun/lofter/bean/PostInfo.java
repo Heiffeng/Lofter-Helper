@@ -11,6 +11,7 @@ public class PostInfo {
     private List<Picture> pictures;
     private List<Comment> comments;
     private Integer hot;
+    private String themeName;
 
     public String getContent() {
         return content;
@@ -58,5 +59,13 @@ public class PostInfo {
 
     public void setHot(Integer hot) {
         this.hot = hot;
+    }
+
+    public String getThemeName() {
+        return themeName;
+    }
+
+    public void setThemeName(String themeName) {
+        this.themeName = themeName;
     }
 }

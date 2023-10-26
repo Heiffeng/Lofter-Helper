@@ -103,6 +103,7 @@ public class LofterUserService {
         postInfo.setPostTime(post.getPostTime());
         postInfo.setHot(post.getHot());
         postInfo.setComments(post.getComments());
+        postInfo.setThemeName(post.getThemeName());
 
         List<Picture> pics = post.getPictures();
         if(pics!=null) {

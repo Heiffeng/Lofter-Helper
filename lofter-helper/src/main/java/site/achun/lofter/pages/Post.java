@@ -4,6 +4,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import site.achun.lofter.bean.Comment;
 import site.achun.lofter.bean.Picture;
+import site.achun.lofter.pages.extractor.AbstractPostExtractor;
+import site.achun.lofter.pages.extractor.PostExtractorFactory;
 import site.achun.lofter.utils.UrlHandler;
 
 import java.net.MalformedURLException;
@@ -13,8 +15,11 @@ import java.util.stream.Collectors;
 
 public class Post {
     private Document document;
+
+    private AbstractPostExtractor extractor;
     public Post(Document document){
         this.document = document;
+        this.extractor = PostExtractorFactory.create(getThemeName(),document);
     }
 
     public List<Picture> getPictures(){
@@ -56,13 +61,13 @@ public class Post {
     }
 
     public String getThemeName(){
-        return null;
+        return document.head().select("meta[name='themename']").first().attr("content");
     }
 
     public Integer getHot(){
         return -1;
     }
     public List<Comment> getComments(){
-        return null;
+        return extractor.getComments();
     }
 }

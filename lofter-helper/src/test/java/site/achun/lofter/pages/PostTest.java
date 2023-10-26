@@ -15,6 +15,7 @@ public class PostTest {
         Document document = HttpClientUtil.getDocument(url);
         Post post = new Post(document);
         System.out.println(post.getPostTime());
+        System.out.println(post.getThemeName());
     }
 
 }
