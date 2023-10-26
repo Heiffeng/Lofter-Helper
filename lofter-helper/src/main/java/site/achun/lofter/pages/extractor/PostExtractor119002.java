@@ -26,23 +26,7 @@ public class PostExtractor119002 extends AbstractPostExtractor{
 
     @Override
     public List<Comment> getComments() {
-//        body > div.bcmt > div.bcmtlst > ul > li:nth-child(1)
-//
-        System.out.println(document.body().html());
-        Elements elements = document.body().select("div.bcmtlsta");
-        if(elements == null || elements.size() == 0){
-            return null;
-        }
-        List<Comment> list = elements.stream().map(ele -> {
-            Comment comment = new Comment();
-            UserInfo userInfo = new UserInfo();
-            userInfo.setUrl(ele.select("a.bcmtlstk").attr("href"));
-            userInfo.setUserName(ele.select("a.bcmtlstk").html());
-            comment.setUserInfo(userInfo);
-            comment.setContent(ele.select("span.bcmtlstf.s-fc4.itag").html());
-            return comment;
-        }).collect(Collectors.toList());
-        return list;
+        return null;
     }
 
     @Override
