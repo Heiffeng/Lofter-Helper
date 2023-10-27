@@ -5,7 +5,7 @@ import site.achun.lofter.bean.Comment;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class DefaultPostExtractor extends AbstractPostExtractor{
+public class DefaultExtractor extends AbstractExtractor {
 
     @Override
     public LocalDateTime getPostTime() {
@@ -20,6 +20,11 @@ public class DefaultPostExtractor extends AbstractPostExtractor{
     @Override
     public Integer getHot() {
         return -1;
+    }
+
+    @Override
+    public String getThemeCode() {
+        return null;
     }
 
 }

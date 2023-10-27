@@ -6,19 +6,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostExtractorFactory {
+public class ExtractorFactory {
 
     private static Map<String,Class> map = new HashMap<>();
     static{
-        map.put("119002",PostExtractor119002.class);
+        map.put("119002", Extractor119002.class);
+        map.put("4002", Extractor4002.class);
     }
 
-    public static AbstractPostExtractor create(String code, Document document){
+    public static AbstractExtractor create(Document document){
         try {
-            AbstractPostExtractor response = null;
-            Class<AbstractPostExtractor> extractorClazz = map.get(code);
+            String code = getThemeCode(document);
+            AbstractExtractor response = null;
+            Class<AbstractExtractor> extractorClazz = map.get(code);
             if(extractorClazz == null){
-                response = new DefaultPostExtractor();
+                response = new DefaultExtractor();
             }else{
                 response = extractorClazz.getDeclaredConstructor().newInstance();
             }
@@ -33,5 +35,8 @@ public class PostExtractorFactory {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+    public static String getThemeCode(Document document){
+        return document.head().select("meta[name='themename']").first().attr("content");
     }
 }

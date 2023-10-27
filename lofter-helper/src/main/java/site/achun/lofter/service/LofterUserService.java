@@ -6,6 +6,7 @@ import site.achun.lofter.bean.Picture;
 import site.achun.lofter.bean.PostInfo;
 import site.achun.lofter.pages.Post;
 import site.achun.lofter.pages.PostPage;
+import site.achun.lofter.pages.extractor.ExtractorFactory;
 import site.achun.lofter.utils.HttpClientUtil;
 import site.achun.lofter.utils.UrlHandler;
 
@@ -103,7 +104,7 @@ public class LofterUserService {
         postInfo.setPostTime(post.getPostTime());
         postInfo.setHot(post.getHot());
         postInfo.setComments(post.getComments());
-        postInfo.setThemeName(post.getThemeName());
+        postInfo.setThemeName(post.getExtractor().getThemeCode());
 
         List<Picture> pics = post.getPictures();
         if(pics!=null) {
@@ -135,7 +136,8 @@ public class LofterUserService {
             // 打开URL连接
             InputStream inputStream = url.openStream();
             // 获取文件名，假设它位于URL的末尾
-            String fileName = UrlHandler.create(pictureUrl).getPath().replace("/img/","");
+            String path = UrlHandler.create(pictureUrl).getPath();
+            String fileName = path.substring(path.lastIndexOf('/') + 1);
             // 创建目标文件的路径
             Path targetPath = imageFileDir.toPath().resolve(fileName);
             // 下载文件并保存到本地

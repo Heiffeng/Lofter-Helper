@@ -9,12 +9,13 @@ public class PostPageTest {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 //        https://sboneqiu.lofter.com
-        String url = "https://sakalee.lofter.com/?page=157&t=1585404058728";
+        String url = "https://chuancao.lofter.com/";
         Document document = HttpClientUtil.getDocument(url);
         document.setBaseUri(url);
 
         PostPage page = new PostPage(document);
         System.out.println(page.getPageIndex());
         System.out.println("NextPage:"+page.nextPage());
+        page.getPostLinks().stream().forEach(System.out::println);
     }
 }
